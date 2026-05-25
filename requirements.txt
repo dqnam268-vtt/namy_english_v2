@@ -6,3 +6,4 @@ bcrypt
 pydantic
 jinja2
 python-multipart
+psycopg2-binary
