@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
+import bcrypt  # Sử dụng trực tiếp bộ thư viện bcrypt chính chủ
 
 import models
 import schemas
@@ -17,28 +17,22 @@ app = FastAPI(title="NamY English App V2")
 # ==========================================
 # CẤU HÌNH GIAO DIỆN (Tất cả trong một)
 # ==========================================
-# 1. Gắn thư mục static để FastAPI đọc được file CSS, JS
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# 2. Gắn thư mục chứa các trang giao diện HTML
 templates = Jinja2Templates(directory="static")
 
 # ==========================================
-# CÁC ROUTE TRẢ VỀ TRANG WEB (HTML)
+# CÁ C ROUTE TRẢ VỀ TRANG WEB (HTML)
 # ==========================================
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
-    """Trang chủ (Cổng đăng nhập)"""
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request):
-    """Trang bảng điều khiển dành cho Thầy"""
     return templates.TemplateResponse("admin.html", {"request": request})
 
 @app.get("/student", response_class=HTMLResponse)
 async def student_page(request: Request):
-    """Trang tổng hợp công cụ học tập cho Học sinh"""
     return templates.TemplateResponse("student.html", {"request": request})
 
 
@@ -46,11 +40,19 @@ async def student_page(request: Request):
 # CÁC ROUTE XỬ LÝ LOGIC NGẦM (API)
 # ==========================================
 
-# Cấu hình mã hóa mật khẩu
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# --- BỘ MÃ HÓA MẬT KHẨU BCRYPT CHÍNH CHỦ MỚI ---
+def hash_password(password: str) -> str:
+    """Hàm băm mật khẩu thô thành chuỗi bảo mật"""
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Hàm so sánh mật khẩu đăng nhập với mật khẩu trong DB"""
+    try:
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except Exception:
+        return False
+
 
 # 1. API Đăng nhập
 @app.post("/api/login", response_model=schemas.LoginResponse)
@@ -66,7 +68,7 @@ def login(user_data: schemas.UserLogin, db: Session = Depends(get_db)):
     return {
         "status": "success",
         "message": "Đăng nhập thành công",
-        "user_id": user.id, # Đã đồng bộ với V2
+        "user_id": user.id,
         "role": user.role,
         "username": user.username
     }
@@ -81,7 +83,9 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="Tên đăng nhập này đã tồn tại. Vui lòng chọn tên khác!"
         )
     
-    hashed_password = pwd_context.hash(user.password)
+    # Mã hóa mật khẩu bằng hàm chính chủ mới
+    hashed_password = hash_password(user.password)
+    
     new_user = models.User(
         username=user.username,
         password_hash=hashed_password,
@@ -100,14 +104,14 @@ def get_syllabus(db: Session = Depends(get_db)):
     result = []
     for week in weeks:
         week_data = {
-            "week_id": week.id, # Đã đồng bộ với V2
+            "week_id": week.id,
             "title": week.title,
             "exercises": []
         }
         for exc in week.exercises:
             activity_names = [act.activity_type for act in exc.activities]
             week_data["exercises"].append({
-                "id": exc.id, # Đã đồng bộ với V2
+                "id": exc.id,
                 "title": exc.title,
                 "activities": activity_names
             })
@@ -132,9 +136,10 @@ def seed_data(db: Session = Depends(get_db)):
     if db.query(models.Week).first():
         return {"message": "Dữ liệu đã tồn tại, không cần tạo lại!"}
     
-    hashed_pw = pwd_context.hash("123456")
+    # Mã hóa bằng hàm brypt mới
+    hashed_pw = hash_password("123456")
     
-    # TẠO 2 TÀI KHOẢN MẪU ĐỂ TEST PHÂN QUYỀN V2
+    # Tạo 2 tài khoản mẫu phân quyền V2
     admin = models.User(username="admin", password_hash=hashed_pw, role="admin")
     student = models.User(username="namy_student", password_hash=hashed_pw, role="student")
     db.add_all([admin, student])
@@ -150,7 +155,7 @@ def seed_data(db: Session = Depends(get_db)):
     db.add(e1)
     db.commit()
 
-    # Tạo 3 Hoạt động cho Bài tập 1
+    # Tạo 3 Hoạt động mẫu
     a1 = models.Activity(exercise_id=e1.id, activity_type="Video watching", content={"url": "video.mp4"}, order_num=1)
     a2 = models.Activity(exercise_id=e1.id, activity_type="Answering questions", content={"q1": "What is..."}, order_num=2)
     a3 = models.Activity(exercise_id=e1.id, activity_type="Matching meaning test", content={"pairs": []}, order_num=3)
