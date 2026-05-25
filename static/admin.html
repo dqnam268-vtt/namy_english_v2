@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NamY English - Quản Trị Viên</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="admin-body">
+    <div class="navbar">
+        <div class="navbar-brand">🎓 NamY English Admin</div>
+        <div class="navbar-user">
+            <span id="admin-name">Thầy Nam</span>
+            <button id="logout-btn" class="btn btn-sm btn-danger">Đăng xuất</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="admin-grid">
+            
+            <div class="card">
+                <h3>👥 Cấp Tài Khoản Học Sinh</h3>
+                <p class="subtitle">Tạo tài khoản học tập độc lập cho từng học sinh trong lớp</p>
+                
+                <div class="form-group">
+                    <label for="reg-username">Tên đăng nhập</label>
+                    <input type="text" id="reg-username" placeholder="Ví dụ: hsguyenvanal">
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-password">Mật khẩu ban đầu</label>
+                    <input type="password" id="reg-password" placeholder="Nhập mật khẩu cấp cho học sinh...">
+                </div>
+                
+                <div id="reg-message" class="message" style="display: none;"></div>
+                
+                <button id="register-btn" class="btn btn-primary btn-block">Tạo Tài Khoản</button>
+            </div>
+            
+            <div class="card">
+                <h3>📊 Trung Tâm Dữ Liệu</h3>
+                <p class="subtitle">Kích hoạt và cấu hình các thông số nội dung học tập</p>
+                
+                <div class="admin-actions">
+                    <button id="seed-btn" class="btn btn-success btn-block">Bơm Dữ Liệu Bài Học Mẫu</button>
+                </div>
+                
+                <div id="seed-message" class="message" style="margin-top: 15px; display: none;"></div>
+                
+                <div style="margin-top: 30px;">
+                    <h4>💡 Hướng dẫn vận hành nhanh:</h4>
+                    <ul class="guide-list" style="margin-top: 10px;">
+                        <li>Điền tên đăng nhập viết liền không dấu và mật khẩu ở bảng bên trái để cấp tài khoản.</li>
+                        <li>Gửi thông tin vừa tạo cho học sinh để các em tự đăng nhập trên thiết bị cá nhân.</li>
+                        <li>Nếu đây là lần đầu tiên chạy ứng dụng và chưa có bài học, hãy nhấn nút "Bơm Dữ Liệu Bài Học Mẫu" màu xanh lá cây để hệ thống tự động khởi tạo cấu trúc lộ trình.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

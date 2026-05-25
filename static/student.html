@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NamY English - Không Gian Học Tập</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="student-body">
+    <div class="navbar">
+        <div class="navbar-brand">🎓 NamY English Space</div>
+        <div class="navbar-user">
+            Chào, <span id="student-name" class="highlight">Học sinh</span>
+            <button id="logout-btn" class="btn btn-sm btn-danger" style="margin-left: 10px;">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="welcome-banner">
+            <h2>Chào mừng em đến với không gian học tập NamY!</h2>
+            <p>Hãy chọn một công cụ bên dưới để bắt đầu nâng cao trình độ Tiếng Anh nhé.</p>
+        </div>
+
+        <h3 class="section-title">🛠️ Các Công Cụ Học Tiếng Anh</h3>
+        <div class="tools-grid">
+            
+            <div class="tool-card accent-green">
+                <div class="tool-icon">📚</div>
+                <h4>Học Từ Vựng (Vocabulary)</h4>
+                <p>Kho từ vựng theo chủ đề, học qua flashcard và phương pháp ghi nhớ thông minh.</p>
+                <button class="btn btn-success btn-sm" onclick="alert('Tính năng Học Từ Vựng đang được tích hợp cấu trúc bài học!')">Mở công cụ</button>
+            </div>
+            
+            <div class="tool-card accent-blue">
+                <div class="tool-icon">✍️</div>
+                <h4>Luyện Ngữ Pháp (Grammar)</h4>
+                <p>Hệ thống bài tập ngữ pháp từ cơ bản đến nâng cao, có giải thích đáp án chi tiết.</p>
+                <button class="btn btn-primary btn-sm" onclick="alert('Tính năng Luyện Ngữ Pháp đang được tích hợp cấu trúc bài học!')">Mở công cụ</button>
+            </div>
+            
+            <div class="tool-card accent-purple">
+                <div class="tool-icon">📖</div>
+                <h4>Luyện Đọc (Reading)</h4>
+                <p>Đọc các đoạn văn ngắn, truyện ngắn và trả lời câu hỏi trắc nghiệm phát triển tư duy.</p>
+                <button class="btn btn-purple btn-sm" onclick="alert('Tính năng Luyện Đọc đang được tích hợp cấu trúc bài học!')">Mở công cụ</button>
+            </div>
+
+            <div class="tool-card accent-orange">
+                <div class="tool-icon">🎧</div>
+                <h4>Phát Âm & Nghe (Phonetics)</h4>
+                <p>Phân tích âm học âm thanh, luyện nghe và phát âm chuẩn bản xứ.</p>
+                <button class="btn btn-orange btn-sm" onclick="alert('Tính năng Luyện Nghe đang được tích hợp cấu trúc bài học!')">Mở công cụ</button>
+            </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top: 40px;">📅 Lộ Trình Bài Học Theo Tuần</h3>
+        <div class="course-content">
+            <p style="text-align:center; padding:20px; color: #666;">Đang tải danh sách bài học từ máy chủ...</p>
+        </div>
+    </div>
+
+    <button id="feedback-btn" class="floating-btn" title="Gửi thắc mắc cho Thầy Nam">✉️</button>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
