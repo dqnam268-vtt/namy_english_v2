@@ -1,4 +1,4 @@
-import os  # Thêm thư viện hệ thống
+import os
 from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -11,21 +11,37 @@ import schemas
 from database import engine, get_db
 
 # ==========================================
-# KHẮC PHỤC TRIỆT ĐỂ LỖI SẬP SERVER TRÊN RENDER
-# Đảm bảo các thư mục giao diện luôn tồn tại trước khi FastAPI khởi chạy
+# ÁO GIÁP 1: BẢO VỆ THƯ MỤC GIAO DIỆN (CHỐNG SẬP TĨNH)
+# Đảm bảo thư mục static luôn tồn tại để FastAPI không báo lỗi
 # ==========================================
 os.makedirs("static", exist_ok=True)
 os.makedirs("static/css", exist_ok=True)
 os.makedirs("static/js", exist_ok=True)
 
-# Tự động tạo các bảng trong Database
-models.Base.metadata.create_all(bind=engine)
+# Tự động tạo file mồi nếu thầy lỡ quên chưa tải các file HTML lên GitHub
+for html_file in ["index.html", "admin.html", "student.html"]:
+    file_path = os.path.join("static", html_file)
+    if not os.path.exists(file_path):
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(f"<h2>Hệ thống đang chạy! Nhưng đang thiếu file: {html_file}</h2><p>Thầy hãy chép file HTML này vào thư mục 'static' trên GitHub nhé.</p>")
 
+# ==========================================
+# ÁO GIÁP 2: BẢO VỆ KẾT NỐI DATABASE (CHỐNG SẬP KHỞI ĐỘNG)
+# Ngăn chặn việc sập Server (Exited status 1) nếu điền sai link Database Neon
+# ==========================================
+try:
+    models.Base.metadata.create_all(bind=engine)
+    print("🚀 TÌNH TRẠNG: KẾT NỐI DATABASE THÀNH CÔNG!")
+except Exception as e:
+    print("========================================")
+    print("❌ LỖI NGHIÊM TRỌNG: KHÔNG THỂ KẾT NỐI DATABASE NEON!")
+    print(f"👉 Nguyên nhân: Thầy hãy kiểm tra lại biến DATABASE_URL trên Render xem có bị sai, dư dấu cách không nhé.")
+    print(f"👉 Mã lỗi kỹ thuật: {e}")
+    print("========================================")
+
+# Khởi tạo Server
 app = FastAPI(title="NamY English App V2")
 
-# ==========================================
-# CẤU HÌNH GIAO DIỆN (Tất cả trong một)
-# ==========================================
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="static")
 
@@ -43,7 +59,6 @@ async def admin_page(request: Request):
 @app.get("/student", response_class=HTMLResponse)
 async def student_page(request: Request):
     return templates.TemplateResponse("student.html", {"request": request})
-
 
 # ==========================================
 # CÁC ROUTE XỬ LÝ LOGIC NGẦM (API)
