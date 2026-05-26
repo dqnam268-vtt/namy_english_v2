@@ -1,0 +1,59 @@
+{
+  "weeks": [
+    {
+      "title": "WEEK 1: INTRODUCTION",
+      "order_num": 1,
+      "exercises": [
+        {
+          "title": "Exercise 1: Basic Greetings",
+          "activities": [
+            {
+              "type": "Video watching",
+              "content": {"url": "https://www.youtube.com/watch?v=sample1"},
+              "order_num": 1
+            },
+            {
+              "type": "Multiple Choice",
+              "content": {
+                "question": "How do you say 'Xin chào' in English?",
+                "options": ["Goodbye", "Hello", "Thank you"],
+                "answer": "Hello"
+              },
+              "order_num": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "WEEK 2: PRESENT SIMPLE TENSE",
+      "order_num": 2,
+      "exercises": [
+        {
+          "title": "Exercise 1: Grammar Practice",
+          "activities": [
+            {
+              "type": "Multiple Choice",
+              "content": {
+                "question": "He __ (go) to school every day.",
+                "options": ["go", "goes", "going"],
+                "answer": "goes"
+              },
+              "order_num": 1
+            },
+            {
+              "type": "Matching",
+              "content": {
+                "pairs": [
+                  {"word": "I", "meaning": "am/do"},
+                  {"word": "He/She", "meaning": "is/does"}
+                ]
+              },
+              "order_num": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
