@@ -1,4 +1,5 @@
 import os
+from typing import List
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -41,7 +42,7 @@ app = FastAPI(title="NamY English App V2")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ==========================================
-# CÁC ROUTE TRẢ VỀ TRANG WEB (Dùng FileResponse siêu ổn định)
+# CÁC ROUTE TRẢ VỀ TRANG WEB
 # ==========================================
 @app.get("/", response_class=HTMLResponse)
 async def home_page():
@@ -56,7 +57,7 @@ async def student_page():
     return FileResponse("static/student.html")
 
 # ==========================================
-# CÁC ROUTE XỬ LÝ LOGIC NGẦM (API)
+# CÁC ROUTE XỬ LÝ LOGIC NGẦM (API CƠ BẢN)
 # ==========================================
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
@@ -132,3 +133,72 @@ def seed_data(db: Session = Depends(get_db)):
     db.commit()
     
     return {"message": "Đã bơm dữ liệu mẫu (Kèm TK admin và student) vào Database thành công!"}
+
+@app.post("/api/add_week")
+def add_week(week: schemas.WeekCreate, db: Session = Depends(get_db)):
+    existing_week = db.query(models.Week).filter(models.Week.order_num == week.order_num).first()
+    if existing_week:
+        raise HTTPException(status_code=400, detail=f"Tuần thứ {week.order_num} đã tồn tại!")
+    
+    new_week = models.Week(title=week.title, order_num=week.order_num)
+    db.add(new_week)
+    db.commit()
+    return {"status": "success", "message": f"Đã tạo thành công: {week.title}"}
+
+@app.get("/api/get_feedbacks")
+def get_feedbacks(db: Session = Depends(get_db)):
+    feedbacks = db.query(models.Feedback, models.User.username)\
+                  .join(models.User, models.Feedback.user_id == models.User.user_id)\
+                  .all()
+    result = []
+    for fb, uname in feedbacks:
+        result.append({
+            "id": fb.feedback_id,
+            "username": uname,
+            "message": fb.message,
+            "location": fb.location
+        })
+    return result
+
+# ==========================================
+# CÁC API THỐNG KÊ VÀ QUẢN LÝ (CMS ADMIN)
+# ==========================================
+@app.get("/api/stats")
+def get_stats(db: Session = Depends(get_db)):
+    total_students = db.query(models.User).filter(models.User.role == "student").count()
+    total_weeks = db.query(models.Week).count()
+    total_feedbacks = db.query(models.Feedback).count()
+    return {
+        "total_students": total_students,
+        "total_weeks": total_weeks,
+        "total_feedbacks": total_feedbacks
+    }
+
+@app.get("/api/users")
+def get_users(db: Session = Depends(get_db)):
+    users = db.query(models.User).filter(models.User.role == "student").all()
+    return [{"id": u.user_id, "username": u.username, "role": u.role} for u in users]
+
+@app.post("/api/register_bulk")
+def register_bulk(users_data: List[schemas.UserCreate], db: Session = Depends(get_db)):
+    created_count = 0
+    errors = []
+    
+    for user in users_data:
+        existing = db.query(models.User).filter(models.User.username == user.username).first()
+        if existing:
+            errors.append(user.username)
+            continue
+            
+        hashed_pw = hash_password(user.password)
+        new_user = models.User(username=user.username, password_hash=hashed_pw, role="student")
+        db.add(new_user)
+        created_count += 1
+        
+    db.commit()
+    
+    msg = f"Đã tạo thành công {created_count} tài khoản."
+    if errors:
+        msg += f" Bỏ qua {len(errors)} tài khoản đã tồn tại: {', '.join(errors)}"
+        
+    return {"status": "success", "message": msg}
