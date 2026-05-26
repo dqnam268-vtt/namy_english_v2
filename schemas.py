@@ -3,12 +3,10 @@ from pydantic import BaseModel
 # ==========================================
 # 1. DỮ LIỆU ĐĂNG NHẬP
 # ==========================================
-# Dữ liệu người dùng gửi lên khi gõ vào form đăng nhập
 class UserLogin(BaseModel):
     username: str
     password: str
 
-# Dữ liệu hệ thống trả về sau khi đăng nhập thành công
 class LoginResponse(BaseModel):
     status: str
     message: str
@@ -19,7 +17,6 @@ class LoginResponse(BaseModel):
 # ==========================================
 # 2. DỮ LIỆU TẠO TÀI KHOẢN (DÀNH CHO ADMIN)
 # ==========================================
-# Dữ liệu khi thầy điền form cấp tài khoản cho học sinh
 class UserCreate(BaseModel):
     username: str
     password: str
@@ -28,8 +25,15 @@ class UserCreate(BaseModel):
 # ==========================================
 # 3. DỮ LIỆU HỘP THƯ (FEEDBACK)
 # ==========================================
-# Dữ liệu nhận form tin nhắn thắc mắc từ học sinh
 class FeedbackCreate(BaseModel):
     message: str
     location: str
     user_id: int
+
+# ==========================================
+# 4. DỮ LIỆU TẠO LỘ TRÌNH (DÀNH CHO ADMIN)
+# ==========================================
+# Đây chính là khuôn mẫu WeekCreate mà hệ thống đang tìm kiếm
+class WeekCreate(BaseModel):
+    title: str
+    order_num: int
