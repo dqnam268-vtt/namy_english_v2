@@ -42,7 +42,7 @@
                         <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">
                             Mẹo: Thầy bôi đen 2 cột (Tài khoản, Mật khẩu) trong <b>Excel</b>, nhấn Copy rồi Paste trực tiếp vào ô dưới đây.
                         </p>
-                        <textarea id="bulk-users-data" rows="8" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 0.9rem; resize: vertical;" placeholder="hs01, 123456&#10;hs02, 123456&#10;hs03, 123456"></textarea>
+                        <textarea id="bulk-users-data" rows="8" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 0.9rem;" placeholder="hs01, 123456&#10;hs02, 123456&#10;hs03, 123456"></textarea>
                         <button id="btn-bulk-register" class="btn btn-primary btn-block" style="margin-top: 15px;">🚀 Tạo Hàng Loạt</button>
                         <div id="bulk-message" class="message" style="display: none; margin-top: 15px;"></div>
                     </div>
@@ -53,17 +53,17 @@
                             <button id="btn-export-excel" class="btn btn-success btn-sm">📥 Xuất file CSV (Excel)</button>
                         </div>
                         
-                        <div style="max-height: 260px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px;">
+                        <div style="max-height: 250px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px;">
                             <table id="users-table" style="width: 100%; border-collapse: collapse; text-align: left;">
                                 <thead style="background: #f4f6f8; position: sticky; top: 0; z-index: 1;">
                                     <tr>
-                                        <th style="padding: 12px; border-bottom: 2px solid #ccc; font-weight: 600;">ID</th>
-                                        <th style="padding: 12px; border-bottom: 2px solid #ccc; font-weight: 600;">Tên Đăng Nhập</th>
-                                        <th style="padding: 12px; border-bottom: 2px solid #ccc; font-weight: 600;">Vai Trò</th>
+                                        <th style="padding: 12px; border-bottom: 2px solid #ccc;">ID</th>
+                                        <th style="padding: 12px; border-bottom: 2px solid #ccc;">Tên Đăng Nhập</th>
+                                        <th style="padding: 12px; border-bottom: 2px solid #ccc;">Vai Trò</th>
                                     </tr>
                                 </thead>
                                 <tbody id="users-list-body">
-                                    <tr><td colspan="3" style="padding: 15px; text-align: center; color: #666;">Đang tải dữ liệu lớp học...</td></tr>
+                                    <tr><td colspan="3" style="padding: 15px; text-align: center; color: #666;">Đang tải dữ liệu...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -72,8 +72,8 @@
             </div>
             
             <div class="card">
-                <h3>👥 Cấp Tài Khoản Học Sinh (Đơn Lẻ)</h3>
-                <p class="subtitle">Tạo tài khoản lẻ cho từng học sinh mới gia nhập</p>
+                <h3>👥 Cấp Tài Khoản Học Sinh</h3>
+                <p class="subtitle">Tạo tài khoản học tập độc lập cho từng học sinh trong lớp</p>
                 <div class="form-group">
                     <label for="reg-username">Tên đăng nhập</label>
                     <input type="text" id="reg-username" placeholder="Ví dụ: hsguyenvanal">
@@ -88,7 +88,7 @@
             
             <div class="card">
                 <h3>📊 Trung Tâm Dữ Liệu</h3>
-                <p class="subtitle">Kích hoạt và cấu hình các thông số hệ thống</p>
+                <p class="subtitle">Kích hoạt và cấu hình các thông số nội dung học tập</p>
                 <div class="admin-actions">
                     <button id="seed-btn" class="btn btn-success btn-block">Bơm Dữ Liệu Bài Học Mẫu</button>
                 </div>
@@ -96,8 +96,8 @@
                 <div style="margin-top: 30px;">
                     <h4>💡 Hướng dẫn vận hành nhanh:</h4>
                     <ul class="guide-list" style="margin-top: 10px;">
-                        <li>Sử dụng khung <b>Tạo Hàng Loạt</b> để copy từ bảng tính Excel nhanh nhất.</li>
-                        <li>Nút <b>Bơm Dữ Liệu</b> dùng để sinh bài tập Tuần 1 mẫu nếu DB trống.</li>
+                        <li>Sử dụng chức năng "Tạo Hàng Loạt" bên trên để copy từ Excel.</li>
+                        <li>Nút "Bơm Dữ Liệu Bài Học Mẫu" giúp tự động khởi tạo cấu trúc lộ trình.</li>
                     </ul>
                 </div>
             </div>
@@ -123,7 +123,7 @@
             <h3>📬 Hòm Thư Học Sinh</h3>
             <p class="subtitle">Các câu hỏi và thắc mắc từ học sinh gửi về</p>
             <div id="feedback-list" style="max-height: 400px; overflow-y: auto;">
-                <p style="color: #666; text-align: center;">Đang tải tin nhắn từ học sinh...</p>
+                <p style="color: #666; text-align: center;">Đang tải tin nhắn...</p>
             </div>
         </div>
 

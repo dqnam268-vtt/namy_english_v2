@@ -167,7 +167,7 @@ function initAdminPage() {
         });
     }
 
-    // 3. Xuất file Excel (CSV UTF-8 chuẩn font tiếng Việt)
+    // 3. Xuất file Excel (CSV UTF-8)
     const exportBtn = document.getElementById("btn-export-excel");
     if (exportBtn) {
         exportBtn.addEventListener("click", () => {
