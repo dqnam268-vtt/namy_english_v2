@@ -113,10 +113,10 @@ function initAdminPage() {
     const adminNameSpan = document.getElementById("admin-name");
     if (adminNameSpan) adminNameSpan.innerText = "Thầy " + (localStorage.getItem("username") || "Nam");
 
-    // 1. Quản lý Thống kê & Bảng Học sinh
+    // 1. Tải Thống kê & Bảng Học sinh
     fetchDashboardData();
 
-    // 2. Cấp tài khoản hàng loạt (Copy từ Excel)
+    // 2. Cấp tài khoản hàng loạt (Copy/Paste từ Excel)
     const bulkBtn = document.getElementById("btn-bulk-register");
     const bulkInput = document.getElementById("bulk-users-data");
     const bulkMsg = document.getElementById("bulk-message");
@@ -167,7 +167,7 @@ function initAdminPage() {
         });
     }
 
-    // 3. Xuất file Excel
+    // 3. Xuất file Excel (CSV UTF-8 chuẩn font tiếng Việt)
     const exportBtn = document.getElementById("btn-export-excel");
     if (exportBtn) {
         exportBtn.addEventListener("click", () => {
@@ -231,7 +231,7 @@ function initAdminPage() {
         });
     }
 
-    // 5. Bơm dữ liệu mẫu
+    // 5. Nút Bơm dữ liệu mẫu
     const seedBtn = document.getElementById("seed-btn");
     const seedMsg = document.getElementById("seed-message");
     
@@ -253,7 +253,7 @@ function initAdminPage() {
         });
     }
 
-    // 6. Tạo bài học mới
+    // 6. Tạo lộ trình bài học mới
     const addWeekBtn = document.getElementById("add-week-btn");
     const weekTitleInp = document.getElementById("week-title");
     const weekOrderInp = document.getElementById("week-order");
@@ -297,12 +297,12 @@ function initAdminPage() {
         });
     }
 
-    // 7. Lấy tin nhắn hòm thư
+    // 7. Lấy danh sách Hòm thư học sinh
     fetchFeedbacks();
 }
 
 // ==========================================
-// HÀM BỔ TRỢ: TẢI SỐ LIỆU VÀ BẢNG DANH SÁCH
+// HÀM LIÊN KẾT: CẬP NHẬT CHỈ SỐ VÀ BẢNG LỚP
 // ==========================================
 async function fetchDashboardData() {
     try {

@@ -40,7 +40,7 @@
                     <div style="flex: 1; min-width: 300px;">
                         <h4 style="color: #1b5e20; margin-bottom: 10px;">➕ Tạo Tài Khoản Hàng Loạt</h4>
                         <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">
-                            Mẹo: Thầy bôi đen 2 cột (Tài khoản, Mật khẩu) trong <b>Excel / Google Sheets</b>, nhấn Copy rồi Paste trực tiếp vào ô dưới đây.
+                            Mẹo: Thầy bôi đen 2 cột (Tài khoản, Mật khẩu) trong <b>Excel</b>, nhấn Copy rồi Paste trực tiếp vào ô dưới đây.
                         </p>
                         <textarea id="bulk-users-data" rows="8" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 0.9rem; resize: vertical;" placeholder="hs01, 123456&#10;hs02, 123456&#10;hs03, 123456"></textarea>
                         <button id="btn-bulk-register" class="btn btn-primary btn-block" style="margin-top: 15px;">🚀 Tạo Hàng Loạt</button>
@@ -74,37 +74,30 @@
             <div class="card">
                 <h3>👥 Cấp Tài Khoản Học Sinh (Đơn Lẻ)</h3>
                 <p class="subtitle">Tạo tài khoản lẻ cho từng học sinh mới gia nhập</p>
-                
                 <div class="form-group">
                     <label for="reg-username">Tên đăng nhập</label>
                     <input type="text" id="reg-username" placeholder="Ví dụ: hsguyenvanal">
                 </div>
-                
                 <div class="form-group">
                     <label for="reg-password">Mật khẩu ban đầu</label>
                     <input type="password" id="reg-password" placeholder="Nhập mật khẩu cấp cho học sinh...">
                 </div>
-                
                 <div id="reg-message" class="message" style="display: none;"></div>
-                
                 <button id="register-btn" class="btn btn-primary btn-block">Tạo Tài Khoản</button>
             </div>
             
             <div class="card">
                 <h3>📊 Trung Tâm Dữ Liệu</h3>
                 <p class="subtitle">Kích hoạt và cấu hình các thông số hệ thống</p>
-                
                 <div class="admin-actions">
                     <button id="seed-btn" class="btn btn-success btn-block">Bơm Dữ Liệu Bài Học Mẫu</button>
                 </div>
-                
                 <div id="seed-message" class="message" style="margin-top: 15px; display: none;"></div>
-                
                 <div style="margin-top: 30px;">
                     <h4>💡 Hướng dẫn vận hành nhanh:</h4>
                     <ul class="guide-list" style="margin-top: 10px;">
-                        <li>Nên ưu tiên bảng <b>Tạo Hàng Loạt</b> ở trên để đẩy danh sách học sinh từ Excel vào nhanh nhất.</li>
-                        <li>Nút <b>Bơm Dữ Liệu</b> giúp thầy khởi tạo cấu trúc bài học mẫu (Tuần 1) nhanh nếu cơ sở dữ liệu Postgres trống.</li>
+                        <li>Sử dụng khung <b>Tạo Hàng Loạt</b> để copy từ bảng tính Excel nhanh nhất.</li>
+                        <li>Nút <b>Bơm Dữ Liệu</b> dùng để sinh bài tập Tuần 1 mẫu nếu DB trống.</li>
                     </ul>
                 </div>
             </div>
@@ -112,19 +105,15 @@
             <div class="card">
                 <h3>📝 Biên Soạn Giáo Án</h3>
                 <p class="subtitle">Thêm lộ trình Tuần học mới vào hệ thống</p>
-                
                 <div class="form-group">
                     <label for="week-title">Tên hiển thị (Ví dụ: WEEK 2 - Tenses)</label>
                     <input type="text" id="week-title" placeholder="Nhập tên tuần học...">
                 </div>
-                
                 <div class="form-group">
                     <label for="week-order">Số thứ tự tuần</label>
                     <input type="number" id="week-order" placeholder="Ví dụ: 2">
                 </div>
-                
                 <div id="week-message" class="message" style="display: none;"></div>
-                
                 <button id="add-week-btn" class="btn btn-primary btn-block">Tạo Tuần Học</button>
             </div>
             
@@ -133,7 +122,6 @@
         <div class="card" style="margin-top: 25px;">
             <h3>📬 Hòm Thư Học Sinh</h3>
             <p class="subtitle">Các câu hỏi và thắc mắc từ học sinh gửi về</p>
-            
             <div id="feedback-list" style="max-height: 400px; overflow-y: auto;">
                 <p style="color: #666; text-align: center;">Đang tải tin nhắn từ học sinh...</p>
             </div>
