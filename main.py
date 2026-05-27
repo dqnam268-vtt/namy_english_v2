@@ -10,40 +10,19 @@ import models
 import schemas
 from database import engine, get_db
 
-# ==========================================
-# ÁO GIÁP 1: BẢO VỆ THƯ MỤC GIAO DIỆN
-# ==========================================
 os.makedirs("static", exist_ok=True)
 os.makedirs("static/css", exist_ok=True)
 os.makedirs("static/js", exist_ok=True)
 
-for html_file in ["index.html", "admin.html", "student.html"]:
-    file_path = os.path.join("static", html_file)
-    if not os.path.exists(file_path):
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(f"<h2>Hệ thống đang chạy! Nhưng đang thiếu file: {html_file}</h2>")
-
-# ==========================================
-# ÁO GIÁP 2: BẢO VỆ KẾT NỐI DATABASE
-# ==========================================
 try:
     models.Base.metadata.create_all(bind=engine)
     print("🚀 TÌNH TRẠNG: KẾT NỐI DATABASE THÀNH CÔNG!")
 except Exception as e:
-    print("========================================")
-    print("❌ LỖI NGHIÊM TRỌNG: KHÔNG THỂ KẾT NỐI DATABASE NEON!")
-    print(f"👉 Mã lỗi kỹ thuật: {e}")
-    print("========================================")
+    print(f"❌ LỖI DATABASE: {e}")
 
-# Khởi tạo Server
 app = FastAPI(title="NamY English App V2")
-
-# Phục vụ file tĩnh (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# ==========================================
-# CÁC ROUTE TRẢ VỀ TRANG WEB
-# ==========================================
 @app.get("/", response_class=HTMLResponse)
 async def home_page():
     return FileResponse("static/index.html")
@@ -56,9 +35,6 @@ async def admin_page():
 async def student_page():
     return FileResponse("static/student.html")
 
-# ==========================================
-# CÁC ROUTE XỬ LÝ LOGIC NGẦM (API CƠ BẢN)
-# ==========================================
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
@@ -73,30 +49,28 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def login(user_data: schemas.UserLogin, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.username == user_data.username).first()
     if not user or not verify_password(user_data.password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Tên đăng nhập hoặc mật khẩu không chính xác")
-    return {"status": "success", "message": "Đăng nhập thành công", "user_id": user.user_id, "role": user.role, "username": user.username}
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Tài khoản hoặc mật khẩu không đúng")
+    return {"status": "success", "message": "Thành công", "user_id": user.user_id, "role": user.role, "username": user.username}
 
 @app.post("/api/register")
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    existing_user = db.query(models.User).filter(models.User.username == user.username).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Tên đăng nhập này đã tồn tại. Vui lòng chọn tên khác!")
-    
-    hashed_password = hash_password(user.password)
-    new_user = models.User(username=user.username, password_hash=hashed_password, role=user.role)
+    existing = db.query(models.User).filter(models.User.username == user.username).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Tài khoản đã tồn tại!")
+    new_user = models.User(username=user.username, password_hash=hash_password(user.password), role=user.role)
     db.add(new_user)
     db.commit()
-    return {"status": "success", "message": f"Đã tạo tài khoản '{user.username}' thành công!"}
+    return {"status": "success", "message": "Đã tạo tài khoản"}
 
 @app.get("/api/get_syllabus")
 def get_syllabus(db: Session = Depends(get_db)):
     weeks = db.query(models.Week).order_by(models.Week.order_num).all()
     result = []
     for week in weeks:
-        week_data = {"week_id": week.week_id, "title": week.title, "exercises": []}
+        week_data = {"week_id": week.week_id, "title": week.title, "order_num": week.order_num, "exercises": []}
         for exc in week.exercises:
-            activity_names = [act.activity_type for act in exc.activities]
-            week_data["exercises"].append({"id": exc.exercise_id, "title": exc.title, "activities": activity_names})
+            act_list = [{"id": a.activity_id, "type": a.activity_type, "content": a.content} for a in exc.activities]
+            week_data["exercises"].append({"id": exc.exercise_id, "title": exc.title, "activities": act_list})
         result.append(week_data)
     return result
 
@@ -105,100 +79,75 @@ def receive_feedback(feedback: schemas.FeedbackCreate, db: Session = Depends(get
     new_feedback = models.Feedback(user_id=feedback.user_id, message=f"[{feedback.location}] {feedback.message}")
     db.add(new_feedback)
     db.commit()
-    return {"status": "success", "message": "Đã lưu phản hồi vào Database"}
-
-@app.post("/api/seed_data")
-def seed_data(db: Session = Depends(get_db)):
-    if db.query(models.Week).first():
-        return {"message": "Dữ liệu đã tồn tại, không cần tạo lại!"}
-    
-    hashed_pw = hash_password("123456")
-    admin = models.User(username="admin", password_hash=hashed_pw, role="admin")
-    student = models.User(username="namy_student", password_hash=hashed_pw, role="student")
-    db.add_all([admin, student])
-    db.commit()
-
-    w1 = models.Week(title="WEEK 1", order_num=1)
-    db.add(w1)
-    db.commit()
-
-    e1 = models.Exercise(title="EXERCISE 1", week_id=w1.week_id, order_num=1)
-    db.add(e1)
-    db.commit()
-
-    a1 = models.Activity(exercise_id=e1.exercise_id, activity_type="Video watching", content={"url": "video.mp4"}, order_num=1)
-    a2 = models.Activity(exercise_id=e1.exercise_id, activity_type="Answering questions", content={"q1": "What is..."}, order_num=2)
-    a3 = models.Activity(exercise_id=e1.exercise_id, activity_type="Matching meaning test", content={"pairs": []}, order_num=3)
-    db.add_all([a1, a2, a3])
-    db.commit()
-    
-    return {"message": "Đã bơm dữ liệu mẫu (Kèm TK admin và student) vào Database thành công!"}
+    return {"status": "success"}
 
 @app.post("/api/add_week")
 def add_week(week: schemas.WeekCreate, db: Session = Depends(get_db)):
-    existing_week = db.query(models.Week).filter(models.Week.order_num == week.order_num).first()
-    if existing_week:
-        raise HTTPException(status_code=400, detail=f"Tuần thứ {week.order_num} đã tồn tại!")
-    
     new_week = models.Week(title=week.title, order_num=week.order_num)
     db.add(new_week)
     db.commit()
-    return {"status": "success", "message": f"Đã tạo thành công: {week.title}"}
+    return {"status": "success", "message": f"Đã thêm tuần: {week.title}"}
+
+@app.post("/api/add_exercise")
+def add_exercise(exe: schemas.ExerciseCreate, db: Session = Depends(get_db)):
+    new_exe = models.Exercise(title=exe.title, week_id=exe.week_id, order_num=exe.order_num)
+    db.add(new_exe)
+    db.commit()
+    return {"status": "success", "message": f"Đã thêm bài tập: {exe.title}"}
+
+@app.post("/api/add_activity")
+def add_activity(act: schemas.ActivityCreate, db: Session = Depends(get_db)):
+    new_act = models.Activity(exercise_id=act.exercise_id, activity_type=act.activity_type, content=act.content, order_num=act.order_num)
+    db.add(new_act)
+    db.commit()
+    return {"status": "success", "message": "Đã thêm hoạt động thành công"}
 
 @app.get("/api/get_feedbacks")
 def get_feedbacks(db: Session = Depends(get_db)):
-    feedbacks = db.query(models.Feedback, models.User.username)\
-                  .join(models.User, models.Feedback.user_id == models.User.user_id)\
-                  .all()
-    result = []
-    for fb, uname in feedbacks:
-        result.append({
-            "id": fb.feedback_id,
-            "username": uname,
-            "message": fb.message,
-            "location": fb.location
-        })
-    return result
+    feedbacks = db.query(models.Feedback, models.User.username).join(models.User, models.Feedback.user_id == models.User.user_id).all()
+    return [{"id": fb.feedback_id, "username": uname, "message": fb.message, "location": fb.location} for fb, uname in feedbacks]
 
-# ==========================================
-# CÁC API THỐNG KÊ VÀ QUẢN LÝ (CMS ADMIN)
-# ==========================================
 @app.get("/api/stats")
 def get_stats(db: Session = Depends(get_db)):
-    total_students = db.query(models.User).filter(models.User.role == "student").count()
-    total_weeks = db.query(models.Week).count()
-    total_feedbacks = db.query(models.Feedback).count()
     return {
-        "total_students": total_students,
-        "total_weeks": total_weeks,
-        "total_feedbacks": total_feedbacks
+        "total_students": db.query(models.User).filter(models.User.role == "student").count(),
+        "total_weeks": db.query(models.Week).count(),
+        "total_feedbacks": db.query(models.Feedback).count()
     }
 
 @app.get("/api/users")
 def get_users(db: Session = Depends(get_db)):
     users = db.query(models.User).filter(models.User.role == "student").all()
-    return [{"id": u.user_id, "username": u.username, "role": u.role} for u in users]
+    result = []
+    for u in users:
+        done_count = db.query(models.Progress).filter(models.Progress.user_id == u.user_id, models.Progress.is_completed == True).count()
+        result.append({"id": u.user_id, "username": u.username, "role": u.role, "done_count": done_count})
+    return result
 
 @app.post("/api/register_bulk")
 def register_bulk(users_data: List[schemas.UserCreate], db: Session = Depends(get_db)):
-    created_count = 0
-    errors = []
-    
+    created = 0
     for user in users_data:
-        existing = db.query(models.User).filter(models.User.username == user.username).first()
-        if existing:
-            errors.append(user.username)
-            continue
-            
-        hashed_pw = hash_password(user.password)
-        new_user = models.User(username=user.username, password_hash=hashed_pw, role="student")
-        db.add(new_user)
-        created_count += 1
-        
+        if not db.query(models.User).filter(models.User.username == user.username).first():
+            db.add(models.User(username=user.username, password_hash=hash_password(user.password), role="student"))
+            created += 1
     db.commit()
-    
-    msg = f"Đã tạo thành công {created_count} tài khoản."
-    if errors:
-        msg += f" Bỏ qua {len(errors)} tài khoản đã tồn tại: {', '.join(errors)}"
-        
-    return {"status": "success", "message": msg}
+    return {"status": "success", "message": f"Đã tạo nhanh {created} tài khoản."}
+
+@app.post("/api/seed_data")
+def seed_data(db: Session = Depends(get_db)):
+    if db.query(models.Week).first():
+        return {"message": "Dữ liệu mẫu đã có sẵn từ trước"}
+    pw = hash_password("123456")
+    db.add_all([models.User(username="admin", password_hash=pw, role="admin"), models.User(username="namy_student", password_hash=pw, role="student")])
+    db.commit()
+    w1 = models.Week(title="WEEK 1: INTRODUCTION & PHONETICS", order_num=1)
+    db.add(w1); db.commit()
+    e1 = models.Exercise(title="Exercise 1: Vowel Pronunciation Analysing", week_id=w1.week_id, order_num=1)
+    db.add(e1); db.commit()
+    db.add_all([
+        models.Activity(exercise_id=e1.exercise_id, activity_type="Học Từ Vựng (Vocabulary)", content={"word": "Phonetics", "meaning": "Acoustic formants"}, order_num=1),
+        models.Activity(exercise_id=e1.exercise_id, activity_type="Phat Âm & Nghe (Phonetics)", content={"url": "praat_analysis.mp4"}, order_num=2)
+    ])
+    db.commit()
+    return {"message": "Đã tạo dữ liệu cấu trúc tuần mẫu thành công!"}
