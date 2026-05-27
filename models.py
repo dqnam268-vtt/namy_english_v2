@@ -3,9 +3,6 @@ from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
-# ==========================================
-# 1. BẢNG NGƯỜI DÙNG (Tài khoản Admin và Học sinh)
-# ==========================================
 class User(Base):
     __tablename__ = "users"
     
@@ -17,9 +14,6 @@ class User(Base):
     progresses = relationship("Progress", back_populates="user", cascade="all, delete-orphan")
     feedbacks = relationship("Feedback", back_populates="user", cascade="all, delete-orphan")
 
-# ==========================================
-# 2. BẢNG CẤU TRÚC BÀI HỌC
-# ==========================================
 class Week(Base):
     __tablename__ = "weeks"
     
@@ -33,38 +27,31 @@ class Exercise(Base):
     __tablename__ = "exercises"
     
     exercise_id = Column(Integer, primary_key=True, index=True)
-    week_id = Column(Integer, ForeignKey("weeks.week_id")) # Liên kết đúng tên cột
+    week_id = Column(Integer, ForeignKey("weeks.week_id"))
     title = Column(String(100), nullable=False)
     order_num = Column(Integer, nullable=False)
     
     week = relationship("Week", back_populates="exercises")
     activities = relationship("Activity", back_populates="exercise", cascade="all, delete-orphan")
 
-# ==========================================
-# 3. BẢNG CÔNG CỤ HỌC TẬP (Vocab, Grammar, Reading...)
-# ==========================================
 class Activity(Base):
     __tablename__ = "activities"
     
     activity_id = Column(Integer, primary_key=True, index=True)
-    exercise_id = Column(Integer, ForeignKey("exercises.exercise_id")) # Liên kết đúng
+    exercise_id = Column(Integer, ForeignKey("exercises.exercise_id"))
     activity_type = Column(String(50), nullable=False) 
-    
     content = Column(JSON, nullable=False) 
     order_num = Column(Integer, nullable=False)
     
     exercise = relationship("Exercise", back_populates="activities")
     progresses = relationship("Progress", back_populates="activity")
 
-# ==========================================
-# 4. BẢNG LƯU TRỮ DỮ LIỆU CỦA HỌC SINH
-# ==========================================
 class Progress(Base):
     __tablename__ = "progress"
     
     progress_id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.user_id")) # Đã sửa khớp 100%
-    activity_id = Column(Integer, ForeignKey("activities.activity_id")) # Đã sửa khớp 100%
+    user_id = Column(Integer, ForeignKey("users.user_id"))
+    activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     score = Column(Integer, default=0) 
     is_completed = Column(Boolean, default=False) 
     
@@ -75,7 +62,7 @@ class Feedback(Base):
     __tablename__ = "feedbacks"
     
     feedback_id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.user_id")) # Đã sửa khớp 100%
+    user_id = Column(Integer, ForeignKey("users.user_id"))
     message = Column(Text, nullable=False)
     location = Column(String(100)) 
     
